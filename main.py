@@ -110,6 +110,21 @@ def updateScore(snake):
     scoreTextRect = scoreText.get_rect(midtop = (W/2, 10))
     screen.blit(scoreText, scoreTextRect)
 
+def gameOver():
+    screen.fill("#fbf7d1")
+    game_over_str = "Voce Perdeu!"
+    game_over_text = main_font.render(game_over_str, False, "#0a6874")
+    game_over_rect = game_over_text.get_rect(center = (W/2, H/2))
+    screen.blit(game_over_text, game_over_rect)
+    game_over_str2 = "Pressione espaco para recomecar!"
+    game_over_text2 = main_font.render(game_over_str2, False, "#0a6874")
+    game_over_rect2 = game_over_text2.get_rect(center = (W/2, H/2 + 30))
+    screen.blit(game_over_text2, game_over_rect2)
+    game_over_str3 = f"Your highscore: {highscore}"
+    game_over_text3 = main_font.render(game_over_str3, False, "#0a6874")
+    game_over_rect3 = game_over_text3.get_rect(center = (W/2, H/15))
+    screen.blit(game_over_text3, game_over_rect3)
+
 W, H = 600, 600
 BLOCK_SIZE = 50
 INITIAL_SIZE = 2
@@ -119,22 +134,24 @@ pygame.init()
 screen = pygame.display.set_mode((W,H))
 pygame.display.set_caption("Jogo da cobrinha")
 clock = pygame.time.Clock()
+gameActive = True
 
-main_font = pygame.font.Font(r"font\Pixeltype.ttf", H // 10)
+main_font = pygame.font.Font(r"font\Pixeltype.ttf", H // 15)
 
 bg_music = pygame.mixer.Sound(r"sounds\bgMusic.wav")
 bg_music.set_volume(0.1)
 bg_music.play(-1)
 food_sound = pygame.mixer.Sound(r"sounds\food.wav")
+food_sound.set_volume(0.2)
 lost_sound = pygame.mixer.Sound(r"sounds\lost.wav")
-lost_sound.set_volume(5)
+lost_sound.set_volume(0.2)
 
 
 snake = Snake(INITIAL_SIZE)
 food = Food(snake)
 
 canChangeDir = True
-
+highscore = 0
 
 """color pallete:
     dark blue #031c29
@@ -145,37 +162,46 @@ canChangeDir = True
     dark pink #a8275d"""
 
 while True:
-    screen.fill("#fbf7d1")
-    draw_grid()
-    
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
         if event.type == pygame.KEYDOWN and canChangeDir:
-            if event.key == pygame.K_w :
+            if event.key == pygame.K_w and gameActive:
                 snake.move("up")
-            elif event.key == pygame.K_s:
+            elif event.key == pygame.K_s and gameActive:
                 snake.move("down")
-            elif event.key == pygame.K_d:
+            elif event.key == pygame.K_d and gameActive:
                 snake.move("right")
-            elif event.key == pygame.K_a:
+            elif event.key == pygame.K_a and gameActive:
                 snake.move("left")
-    
-    if snake.check_food(food):
-        snake.increase_size()
-        food_sound.play()
-        food = Food(snake)
-    
+            if event.key == pygame.K_SPACE and gameActive is False:
+                gameActive = True
 
-    snake.update()
-    
-    if snake.check_collision():
-        lost_sound.play()
-        snake = Snake(INITIAL_SIZE)
-        food = Food(snake)
-    food.draw(snake)
-    updateScore(snake)
+    if gameActive:
+        screen.fill("#fbf7d1")
+        draw_grid()   
+        if snake.check_food(food):
+            snake.increase_size()
+            food_sound.play()
+            food = Food(snake)
+        
+
+        snake.update()
+        
+        if snake.check_collision():
+            lost_sound.play()
+            if len(snake.body) - INITIAL_SIZE > highscore:
+                highscore = len(snake.body) - INITIAL_SIZE
+            snake = Snake(INITIAL_SIZE)
+            food = Food(snake)
+            gameActive = False
+            
+        food.draw(snake)
+        updateScore(snake)
+    else:
+        gameOver()
     
     pygame.display.update()
     clock.tick(10)
