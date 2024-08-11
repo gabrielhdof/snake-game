@@ -106,24 +106,28 @@ def draw_grid():
 
 def updateScore(snake):
     score = len(snake.body) - INITIAL_SIZE
-    scoreText = main_font.render(f"Score = {score}", False, "#0a6874")
+    scoreText = getFont(H / 15).render(f"Score = {score}", False, "#0a6874")
     scoreTextRect = scoreText.get_rect(midtop = (W/2, 10))
     screen.blit(scoreText, scoreTextRect)
 
 def gameOver():
     screen.fill("#fbf7d1")
     game_over_str = "Voce Perdeu!"
-    game_over_text = main_font.render(game_over_str, False, "#0a6874")
+    game_over_text = getFont(H / 10).render(game_over_str, False, "#0a6874")
     game_over_rect = game_over_text.get_rect(center = (W/2, H/2))
     screen.blit(game_over_text, game_over_rect)
     game_over_str2 = "Pressione espaco para recomecar!"
-    game_over_text2 = main_font.render(game_over_str2, False, "#0a6874")
-    game_over_rect2 = game_over_text2.get_rect(center = (W/2, H/2 + 30))
+    game_over_text2 = getFont(H/15).render(game_over_str2, False, "#0a6874")
+    game_over_rect2 = game_over_text2.get_rect(center = (W/2, H - H/15))
     screen.blit(game_over_text2, game_over_rect2)
     game_over_str3 = f"Your highscore: {highscore}"
-    game_over_text3 = main_font.render(game_over_str3, False, "#0a6874")
+    game_over_text3 = getFont(H/15).render(game_over_str3, False, "#0a6874")
     game_over_rect3 = game_over_text3.get_rect(center = (W/2, H/15))
     screen.blit(game_over_text3, game_over_rect3)
+
+def getFont(size):
+    return  pygame.font.Font(r"font\Pixeltype.ttf", int(size))
+
 
 W, H = 600, 600
 BLOCK_SIZE = 50
@@ -135,8 +139,6 @@ screen = pygame.display.set_mode((W,H))
 pygame.display.set_caption("Jogo da cobrinha")
 clock = pygame.time.Clock()
 gameActive = True
-
-main_font = pygame.font.Font(r"font\Pixeltype.ttf", H // 15)
 
 bg_music = pygame.mixer.Sound(r"sounds\bgMusic.wav")
 bg_music.set_volume(0.1)
