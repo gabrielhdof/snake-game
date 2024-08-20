@@ -1,4 +1,4 @@
-import pygame, sys
+import pygame, sys, os
 import random
 
 
@@ -120,13 +120,28 @@ def gameOver():
     game_over_text2 = getFont(H/15).render(game_over_str2, False, "#0a6874")
     game_over_rect2 = game_over_text2.get_rect(center = (W/2, H - H/15))
     screen.blit(game_over_text2, game_over_rect2)
-    game_over_str3 = f"Your highscore: {highscore}"
+    game_over_str3 = f"Your highscore: {highScore}"
     game_over_text3 = getFont(H/15).render(game_over_str3, False, "#0a6874")
     game_over_rect3 = game_over_text3.get_rect(center = (W/2, H/15))
     screen.blit(game_over_text3, game_over_rect3)
 
 def getFont(size):
     return  pygame.font.Font(r"font\Pixeltype.ttf", int(size))
+
+def getScore():
+    global highScore
+    if os.path.exists("highscore.txt"):
+        file = open("highscore.txt", "r")
+        highScore = int(file.readline())
+        file.close()
+    else:
+        writeHighScore()
+
+def writeHighScore():
+    file = open("highscore.txt", "w")
+    file.write(str(highScore))
+    file.close()
+
 
 
 W, H = 600, 600
@@ -153,7 +168,13 @@ snake = Snake(INITIAL_SIZE)
 food = Food(snake)
 
 canChangeDir = True
-highscore = 0
+
+highScore = 0
+getScore()
+
+
+
+
 
 """color pallete:
     dark blue #031c29
@@ -194,8 +215,11 @@ while True:
         
         if snake.check_collision():
             lost_sound.play()
-            if len(snake.body) - INITIAL_SIZE > highscore:
-                highscore = len(snake.body) - INITIAL_SIZE
+            if len(snake.body) - INITIAL_SIZE > highScore:
+                highScore = len(snake.body) - INITIAL_SIZE
+                writeHighScore()
+                
+
             snake = Snake(INITIAL_SIZE)
             food = Food(snake)
             gameActive = False
